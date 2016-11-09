@@ -11,59 +11,66 @@ if (isset($_SERVER['SUDO_USER'])) {
     define('VALET_HOME_PATH', $_SERVER['HOME'].'/.valet');
 }
 
-/**
+/*
  * Output the given text to the console.
  *
  * @param string $output
  *
  * @return void
  */
-function info($output)
-{
-    output('<info>'.$output.'</info>');
-}
+ if (!function_exists('info')) {
+     function info($output)
+     {
+         output('<info>'.$output.'</info>');
+     }
+ }
 
-/**
+/*
  * Output the given text to the console.
  *
  * @param string $output
  *
  * @return void
  */
-function warning($output)
-{
-    output('<fg=red>'.$output.'</>');
-}
+ if (!function_exists('warning')) {
+     function warning($output)
+     {
+         output('<fg=red>'.$output.'</>');
+     }
+ }
 
-/**
+/*
  * Output the given text to the console.
  *
  * @param string $output
  *
  * @return void
  */
-function output($output)
-{
-    if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] == 'testing') {
-        return;
-    }
+ if (!function_exists('output')) {
+     function output($output)
+     {
+         if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] == 'testing') {
+             return;
+         }
 
-    (new Symfony\Component\Console\Output\ConsoleOutput())->writeln($output);
-}
-
-/**
+         (new Symfony\Component\Console\Output\ConsoleOutput())->writeln($output);
+     }
+ }
+/*
  * Resolve the given class from the container.
  *
  * @param string $class
  *
  * @return mixed
  */
-function resolve($class)
-{
-    return Container::getInstance()->make($class);
-}
+ if (!function_exists('resolve')) {
+     function resolve($class)
+     {
+         return Container::getInstance()->make($class);
+     }
+ }
 
-/**
+/*
  * Swap the given class implementation in the container.
  *
  * @param string $class
@@ -71,12 +78,13 @@ function resolve($class)
  *
  * @return void
  */
-function swap($class, $instance)
-{
-    Container::getInstance()->instance($class, $instance);
-}
-
-/**
+ if (!function_exists('swap')) {
+     function swap($class, $instance)
+     {
+         Container::getInstance()->instance($class, $instance);
+     }
+ }
+/*
  * Retry the given function N times.
  *
  * @param int      $retries
@@ -85,9 +93,10 @@ function swap($class, $instance)
  *
  * @return mixed
  */
-function retry($retries, $fn, $sleep = 0)
-{
-    beginning:
+ if (!function_exists('retry')) {
+     function retry($retries, $fn, $sleep = 0)
+     {
+         beginning:
     try {
         return $fn();
     } catch (Exception $e) {
@@ -103,19 +112,22 @@ function retry($retries, $fn, $sleep = 0)
 
         goto beginning;
     }
-}
+     }
+ }
 
-/**
+/*
  * Verify that the script is currently running as "sudo".
  *
  * @return void
  */
-function should_be_sudo()
-{
-    if (!isset($_SERVER['SUDO_USER'])) {
-        throw new Exception('This command must be run with sudo.');
-    }
-}
+ if (!function_exists('should_be_sudo')) {
+     function should_be_sudo()
+     {
+         if (!isset($_SERVER['SUDO_USER'])) {
+             throw new Exception('This command must be run with sudo.');
+         }
+     }
+ }
 
 /*
  * Tap the given value.
@@ -143,14 +155,16 @@ if (!function_exists('tap')) {
 }
 
 
-/**
+/*
  * Get the user.
  */
-function user()
-{
-    if (!isset($_SERVER['SUDO_USER'])) {
-        return $_SERVER['USER'];
-    }
+ if (!function_exists('user')) {
+     function user()
+     {
+         if (!isset($_SERVER['SUDO_USER'])) {
+             return $_SERVER['USER'];
+         }
 
-    return $_SERVER['SUDO_USER'];
-}
+         return $_SERVER['SUDO_USER'];
+     }
+ }
