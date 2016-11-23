@@ -1,6 +1,6 @@
 <?php
 
-class ContaoValetDriver extends ValetDriver
+class ProcessWireValetDriver extends ValetDriver
 {
     /**
      * Determine if the driver serves the request.
@@ -13,7 +13,7 @@ class ContaoValetDriver extends ValetDriver
      */
     public function serves($sitePath, $siteName, $uri)
     {
-        return is_dir($sitePath.'/vendor/contao') && file_exists($sitePath.'/web/app.php');
+        return is_dir($sitePath.'/wire');
     }
 
     /**
@@ -27,7 +27,7 @@ class ContaoValetDriver extends ValetDriver
      */
     public function isStaticFile($sitePath, $siteName, $uri)
     {
-        if ($this->isActualFile($staticFilePath = $sitePath.'/web'.$uri)) {
+        if (file_exists($staticFilePath = $sitePath.$uri)) {
             return $staticFilePath;
         }
 
@@ -45,10 +45,13 @@ class ContaoValetDriver extends ValetDriver
      */
     public function frontControllerPath($sitePath, $siteName, $uri)
     {
-        if ($uri === '/install.php') {
-            return $sitePath.'/web/install.php';
+        if (strpos($uri, 'install.php') !== false) {
+            return $sitePath.$uri;
         }
+        $_GET['it'] = $uri;
+        $_SERVER['SCRIPT_FILENAME'] = $sitePath.'/index.php';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
 
-        return $sitePath.'/web/app.php';
+        return $sitePath.'/index.php';
     }
 }

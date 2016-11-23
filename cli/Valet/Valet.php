@@ -30,9 +30,9 @@ class Valet
      */
     public function symlinkToUsersBin()
     {
-        $this->cli->quietlyAsUser('rm '.$this->valetBin);
+        $this->cli->quietly('rm '.$this->valetBin);
 
-        $this->cli->runAsUser('ln -s '.realpath(__DIR__.'/../../valet').' '.$this->valetBin);
+        $this->cli->run('ln -s '.realpath(__DIR__.'/../../valet').' '.$this->valetBin);
     }
 
     /**
@@ -44,10 +44,10 @@ class Valet
     {
         $this->files->ensureDirExists('/etc/sudoers.d');
 
-        $this->files->put(
-            '/etc/sudoers.d/valet', 'Cmnd_Alias VALET = /usr/local/bin/valet *
-%admin ALL=(root) NOPASSWD: VALET'.PHP_EOL
-        );
+        $this->files->put('/etc/sudoers.d/valet', 'Cmnd_Alias VALET = /usr/local/bin/valet *
+%sudo ALL=(root) NOPASSWD: VALET'.PHP_EOL);
+
+        $this->cli->quietly('chmod 0440 /etc/sudoers.d/valet');
     }
 
     /**

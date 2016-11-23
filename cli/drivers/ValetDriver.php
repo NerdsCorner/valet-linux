@@ -63,6 +63,14 @@ abstract class ValetDriver
         $drivers[] = 'ContaoValetDriver';
         $drivers[] = 'KatanaValetDriver';
         $drivers[] = 'JoomlaValetDriver';
+        $drivers[] = 'ProcessWireValetDriver';
+        $drivers[] = 'SphinxValetDriver';
+        $drivers[] = 'ThemosisValetDriver';
+        $drivers[] = 'CsCartValetDriver';
+        $drivers[] = 'JekyllValetDriver';
+        $drivers[] = 'DrupalValetDriver';
+        $drivers[] = 'ShopWareValetDriver';
+        $drivers[] = 'SinglePageApplicationValetDriver';
 
         $drivers[] = 'BasicValetDriver';
 

@@ -40,7 +40,7 @@ class Ngrok
     public function findHttpTunnelUrl(array $tunnels)
     {
         foreach ($tunnels as $tunnel) {
-            if ($tunnel->proto == 'http') {
+            if ($tunnel->proto === 'http') {
                 return $tunnel->public_url;
             }
         }

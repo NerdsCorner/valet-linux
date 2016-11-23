@@ -32,7 +32,7 @@ class Site
     public function host($path)
     {
         foreach ($this->files->scandir($this->sitesPath()) as $link) {
-            if ($resolved = realpath($this->sitesPath().'/'.$link) == $path) {
+            if ($resolved = realpath($this->sitesPath().'/'.$link) === $path) {
                 return $link;
             }
         }
@@ -165,7 +165,7 @@ class Site
             'openssl x509 -req -days 365 -in %s -signkey %s -out %s', $csrPath, $keyPath, $crtPath
         ));
 
-        $this->trustCertificate($crtPath);
+        $this->trustCertificate($crtPath, $url);
     }
 
     /**
@@ -202,10 +202,14 @@ class Site
      *
      * @return void
      */
-    public function trustCertificate($crtPath)
+    public function trustCertificate($crtPath, $url)
     {
         $this->cli->run(sprintf(
-            'sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain %s', $crtPath
+            'certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "%s" -i "%s"', $url, $crtPath
+        ));
+
+        $this->cli->run(sprintf(
+            'certutil -d $HOME/.mozilla/firefox/*.default -A -t TC -n "%s" -i "%s"', $url, $crtPath
         ));
     }
 
@@ -243,7 +247,8 @@ class Site
             $this->files->unlink($this->certificatesPath().'/'.$url.'.csr');
             $this->files->unlink($this->certificatesPath().'/'.$url.'.crt');
 
-            $this->cli->run(sprintf('sudo security delete-certificate -c "%s" -t', $url));
+            $this->cli->run(sprintf('certutil -d sql:$HOME/.pki/nssdb -D -n "%s"', $url));
+            $this->cli->run(sprintf('certutil -d $HOME/.mozilla/firefox/*.default -D -n "%s"', $url));
         }
     }
 

@@ -1,7 +1,14 @@
 <?php
 
-class ContaoValetDriver extends ValetDriver
+class SphinxValetDriver extends ValetDriver
 {
+    protected $detectFiles = [
+        'source/conf.py',
+        'make.bat',
+        'Makefile',
+    ];
+    protected $index = '/build/html/index.html';
+
     /**
      * Determine if the driver serves the request.
      *
@@ -9,11 +16,17 @@ class ContaoValetDriver extends ValetDriver
      * @param string $siteName
      * @param string $uri
      *
-     * @return bool
+     * @return void
      */
     public function serves($sitePath, $siteName, $uri)
     {
-        return is_dir($sitePath.'/vendor/contao') && file_exists($sitePath.'/web/app.php');
+        foreach ($this->detectFiles as $file) {
+            if (!file_exists($sitePath.'/'.$file)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -27,7 +40,7 @@ class ContaoValetDriver extends ValetDriver
      */
     public function isStaticFile($sitePath, $siteName, $uri)
     {
-        if ($this->isActualFile($staticFilePath = $sitePath.'/web'.$uri)) {
+        if (file_exists($staticFilePath = $sitePath.'/build/html/'.$uri)) {
             return $staticFilePath;
         }
 
@@ -45,10 +58,8 @@ class ContaoValetDriver extends ValetDriver
      */
     public function frontControllerPath($sitePath, $siteName, $uri)
     {
-        if ($uri === '/install.php') {
-            return $sitePath.'/web/install.php';
+        if ($uri === '/') {
+            return $sitePath.$this->index;
         }
-
-        return $sitePath.'/web/app.php';
     }
 }

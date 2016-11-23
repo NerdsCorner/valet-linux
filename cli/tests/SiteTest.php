@@ -35,7 +35,7 @@ class SiteTest extends PHPUnit_Framework_TestCase
         swap(Configuration::class, $config);
 
         $linkPath = resolve(Site::class)->link('target', 'link');
-        $this->assertEquals(VALET_HOME_PATH.'/Sites/link', $linkPath);
+        $this->assertSame(VALET_HOME_PATH.'/Sites/link', $linkPath);
     }
 
     public function test_unlink_removes_existing_symlink()
@@ -44,11 +44,11 @@ class SiteTest extends PHPUnit_Framework_TestCase
         symlink(__DIR__.'/output/file.out', __DIR__.'/output/link');
         $site = resolve(StubForRemovingLinks::class);
         $site->unlink('link');
-        $this->assertFalse(file_exists(__DIR__.'/output/link'));
+        $this->assertFileNotExists(__DIR__.'/output/link');
 
         $site = resolve(StubForRemovingLinks::class);
         $site->unlink('link');
-        $this->assertFalse(file_exists(__DIR__.'/output/link'));
+        $this->assertFileNotExists(__DIR__.'/output/link');
     }
 
     public function test_prune_links_removes_broken_symlinks_in_sites_path()
@@ -58,13 +58,13 @@ class SiteTest extends PHPUnit_Framework_TestCase
         unlink(__DIR__.'/output/file.out');
         $site = resolve(StubForRemovingLinks::class);
         $site->pruneLinks();
-        $this->assertFalse(file_exists(__DIR__.'/output/link'));
+        $this->assertFileNotExists(__DIR__.'/output/link');
     }
 
     public function test_logs_method_returns_array_of_log_files()
     {
         $logs = resolve(Site::class)->logs([__DIR__.'/test-directory-for-logs']);
-        $this->assertEquals(__DIR__.'/test-directory-for-logs/project/storage/logs/laravel.log', $logs[0]);
+        $this->assertSame(__DIR__.'/test-directory-for-logs/project/storage/logs/laravel.log', $logs[0]);
         unlink(__DIR__.'/test-directory-for-logs/project/storage/logs/laravel.log');
     }
 }

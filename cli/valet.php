@@ -18,7 +18,7 @@ use Silly\Application;
  */
 Container::setInstance(new Container());
 
-$version = '2.0.10';
+$version = '2.1.0';
 
 $app = new Application('Laravel Valet (Linux Edition)', $version);
 
@@ -36,7 +36,6 @@ if (is_dir(VALET_HOME_PATH)) {
  */
 $app->command('install', function () {
     Caddy::stop();
-
     Configuration::install();
     Caddy::install();
     PhpFpm::install();
@@ -44,8 +43,8 @@ $app->command('install', function () {
     Caddy::restart();
     Valet::symlinkToUsersBin();
     Valet::createSudoersEntry();
-    // Brew::createSudoersEntry();
-    // Ubuntu::createSudoersEntry();
+
+    passthru('/bin/bash '.__DIR__.'/scripts/install-packages.sh');
 
     output(PHP_EOL.'<info>Valet installed successfully!</info>');
 })->descriptions('Install the Valet services');
@@ -124,7 +123,7 @@ $app->command('links', function () {
  * Unlink a link from the Valet links directory.
  */
 $app->command('unlink [name]', function ($name) {
-    Site::unlink($name ?: basename(getcwd()));
+    Site::unlink($name = $name ?: basename(getcwd()));
 
     info('The ['.$name.'] symbolic link has been removed.');
 })->descriptions('Remove the specified Valet link');
@@ -142,7 +141,7 @@ $app->command('secure [domain]', function ($domain = null) {
     Caddy::restart();
 
     info('The ['.$url.'] site has been secured with a fresh TLS certificate.');
-});
+})->descriptions('Create a TLS certificate for the specified site');
 
 $app->command('unsecure [domain]', function ($domain = null) {
     $url = ($domain ?: Site::host(getcwd())).'.'.Configuration::read()['domain'];
@@ -154,7 +153,7 @@ $app->command('unsecure [domain]', function ($domain = null) {
     Caddy::restart();
 
     info('The ['.$url.'] site will now serve traffic over HTTP.');
-});
+})->descriptions('Remove a TLS certificate from the specified site');
 
 /*
  * Determine which Valet driver the current directory is using.
@@ -169,7 +168,7 @@ $app->command('which', function () {
     } else {
         warning('Valet could not determine which driver to use for this site.');
     }
-})->descriptions('Determine which Valet driver serves the current workign directory');
+})->descriptions('Determine which Valet driver serves the current working directory');
 
 /*
  * Stream all of the logs for all sites.
