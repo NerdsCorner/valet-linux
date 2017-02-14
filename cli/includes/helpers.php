@@ -154,7 +154,6 @@ if (!function_exists('tap')) {
     }
 }
 
-
 /*
  * Get the user.
  */

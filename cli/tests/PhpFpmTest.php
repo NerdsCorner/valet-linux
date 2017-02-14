@@ -32,7 +32,6 @@ class PhpFpmTest extends PHPUnit_Framework_TestCase
     }
 }
 
-
 class StubForUpdatingFpmConfigFiles extends PhpFpm
 {
     public function fpmConfigPath()

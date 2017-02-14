@@ -1,9 +1,9 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: gordo
- * Date: 31/05/16
- * Time: 11:55 AM.
+ * User: sunznx
+ * Date: 2017-01-17
+ * Time: 23:03:20.
  */
 
 namespace Valet;
@@ -11,73 +11,54 @@ namespace Valet;
 use DomainException;
 use Valet\Contracts\LinuxContract;
 
-class Ubuntu implements LinuxContract
+class Fedora implements LinuxContract
 {
     public $cli;
     public $files;
 
+    /**
+     * Arch constructor.
+     *
+     * @param CommandLine $cli
+     * @param Filesystem  $files
+     */
     public function __construct(CommandLine $cli, Filesystem $files)
     {
         $this->cli = $cli;
         $this->files = $files;
     }
 
-    /**
-     * Determine if the given formula is installed.
-     *
-     * @param string $package
-     *
-     * @return bool
-     */
-    public function installed(string $package) :bool
+    public function installed(string $package) : bool
     {
-        return in_array($package,
-            explode(PHP_EOL, $this->cli->run('dpkg -l | grep '.$package.' | sed \'s_  _\t_g\' | cut -f 2')));
+        return strcmp(substr($this->cli->run('sudo rpm -q '.$package), 0, strlen($package)), $package) === 0;
     }
 
-    /**
-     * Install the given formula and throw an exception on failure.
-     *
-     * @param string $package
-     *
-     * @return void
-     */
     public function installOrFail(string $package)
     {
         output('<info>['.$package.'] is not installed, installing it now...</info> 🍻');
 
-        $this->cli->run('apt-get install '.$package, function ($errorOutput) use ($package) {
+        $this->cli->run('sudo dnf install -y '.$package, function ($errorOutput) use ($package) {
             output($errorOutput);
 
             throw new DomainException('Unable to install ['.$package.'].');
         });
     }
 
-    /**
-     * Restart the given Homebrew services.
-     *
-     * @param
-     */
     public function restartService($services)
     {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
-            $this->cli->quietly('sudo service '.$service.' restart');
+            $this->cli->quietly('sudo systemctl restart '.$service);
         }
     }
 
-    /**
-     * Stop the given Homebrew services.
-     *
-     * @param
-     */
     public function stopService($services)
     {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
-            $this->cli->quietly('sudo service '.$service.' stop');
+            $this->cli->quietly('sudo systemctl stop '.$service);
         }
     }
 
@@ -109,16 +90,12 @@ class Ubuntu implements LinuxContract
         }
     }
 
-    /**
-     * Determine which version of PHP is linked in Homebrew.
-     *
-     * @return string
-     */
     public function linkedPhp() :string
     {
-        if (!$this->files->isLink($this->getConfig('php-bin'))) {
+        return 'php';
+        /*if (!$this->files->isLink($this->getConfig('php-bin'))) {
             throw new DomainException('Unable to determine linked PHP.');
-        }
+        }*/
 
         $resolvedPath = $this->files->readLink($this->getConfig('php-bin'));
 
@@ -137,32 +114,27 @@ class Ubuntu implements LinuxContract
     {
         $config = [
             // PHP binary path
-            'php-bin'           => '/usr/bin/php',
+            'php-bin' => '/usr/bin/php',
 
             // Latest PHP
-            'php-latest'        => 'php7.0',
-            'fpm-service'       => 'php7.0-fpm',
-            'fpm-config'        => '/etc/php/7.0/fpm/pool.d/www.conf',
+            'php-latest'  => 'php',
+            'fpm-service' => 'php-fpm',
+            'fpm-config'  => '/etc/php-fpm.d/www.conf',
 
             // Caddy/Systemd
             'systemd-caddy'     => '/lib/systemd/system/caddy.service',
-            'systemd-caddy-fpm' => '/var/run/php/php7.0-fpm.sock',
-
-            // PHP 7.1 (not on official repos)
-            'php-71'            => 'php7.1',
-            'fpm71-service'     => 'php7.1-fpm',
-            'fpm71-config'      => '/etc/php/7.1/fpm/php-fpm.conf',
+            'systemd-caddy-fpm' => '/var/run/php-fpm/php-fpm.sock',
 
             // PHP 5.6
-            'php-56'            => 'php5.6',
-            'fpm56-service'     => 'php5.6-fpm',
-            'fpm56-config'      => '/etc/php/5.6/php-fpm.conf',
+            'php-56'        => 'php56-php-fpm',
+            'fpm56-service' => 'php56-php-fpm',
+            'fpm56-config'  => '/opt/remi/php56/root/etc/php-fpm.conf',
 
-            // PHP 5.5
-            'php-55'            => 'php5.5',
-            'fpm55-service'     => 'php5.5-fpm',
-            'fpm55-config'      => '/etc/php/5.5/php-fpm.conf',
-            'network-manager'   => 'network-manager',
+            'php-55'        => 'php55-php-fpm',
+            'fpm55-service' => 'php55-php-fpm',
+            'fpm55-config'  => '/opt/remi/php55/root/etc/php-fpm.conf',
+
+            'network-manager' => 'NetworkManager',
         ];
 
         return $config[$value];

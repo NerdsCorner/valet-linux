@@ -55,7 +55,6 @@ conf-file='.__DIR__.'/output/custom-dnsmasq.conf
     // }
 }
 
-
 class StubForCreatingCustomDnsMasqConfigFiles extends DnsMasq
 {
     public function customConfigPath()

@@ -5,6 +5,7 @@
  * Date: 31/05/16
  * Time: 11:50 AM.
  */
+
 namespace Valet\Contracts;
 
 interface LinuxContract

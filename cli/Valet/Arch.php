@@ -5,6 +5,7 @@
  * Date: 31/05/16
  * Time: 12:48 PM.
  */
+
 namespace Valet;
 
 use DomainException;

@@ -14,6 +14,11 @@ Laravel Valet *for Linux* configures your system to always run [Caddy](https://c
 
 In other words, a blazing fast Laravel development environment that uses roughly 7mb of RAM. Valet *for Linux* isn't a complete replacement for Vagrant or Homestead, but provides a great alternative if you want flexible basics, prefer extreme speed, or are working on a machine with a limited amount of RAM.
 
+## Supported Linux Distributions
+    - Ubuntu and Derivates like: Linux Mint, elementaryOS, ZorinOS, etc
+    - Arch Linux and Derivates like: Manjaro, Astergos, etc
+    - Fedora and near Derivates
+
 ## Official Documentation
 
 Documentation for Valet can be found on the [Laravel website](http://laravel.com/docs/5.2/valet).
@@ -58,6 +63,29 @@ To check the status of the **Valet _for Linux_** services.
 To update your Valet package just run: `composer global update`
 
 ## F.A.Q.
+
+**Having problems with .dev domains not pointing to 127.0.0.1?**
+Try this: Thanks to @adriaanzon for the guide
+Comment out this line in `/etc/NetworkManager/NetworkManager.conf`:
+
+```
+dns=default
+```
+
+Uncomment this line in `/etc/resolvconf.conf`
+
+```
+#name_servers=127.0.0.1
+```
+
+Append this to `/etc/dnsmasq.conf`
+
+```
+no-resolv
+server=8.8.8.8
+server=8.8.4.4
+```
+
 
 **Why is my preferred distribution not supported?**
 

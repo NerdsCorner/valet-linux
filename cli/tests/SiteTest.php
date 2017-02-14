@@ -69,7 +69,6 @@ class SiteTest extends PHPUnit_Framework_TestCase
     }
 }
 
-
 class StubForRemovingLinks extends Site
 {
     public function sitesPath()

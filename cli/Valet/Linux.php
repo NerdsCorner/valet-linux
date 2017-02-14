@@ -27,28 +27,18 @@ class Linux implements LinuxContract
 
     public function getDistributionInstance() : LinuxContract
     {
-        $match = [];
-        preg_match('/.*-(\w*)/i', strtolower(php_uname('r')), $match);
-        /*
-         * Using a custom kernel on Arch? uname may not have Arch identifier.
-         * Check /etc/issue as a fallback.
-         */
-        if (is_file('/etc/issue') && $match != 'ubuntu' && $match != 'manjaro') {
-            // get contents of /etc/issue into a string
-            $filename = '/etc/issue';
-            $handle = fopen($filename, 'r');
-            $contents = fread($handle, filesize($filename));
-            fclose($handle);
-            if (preg_match('/^Arch/', $contents) == true) {
-                $match[1] = 'arch';
-            }
-        }
-        switch ($match[1]) {
-            case 'manjaro':
-            case 'arch':
-                return new Arch($this->cli, $this->files);
-            default:
-                return new Ubuntu($this->cli, $this->files);
+        $fedora_file = '/usr/bin/dnf';
+        $ubuntu_file = '/usr/bin/apt-get';
+        $arch_file = '/usr/bin/pacman';
+
+        if (file_exists($fedora_file) === true) {
+            return new Fedora($this->cli, $this->files);
+        } elseif (file_exists($ubuntu_file) === true) {
+            return new Ubuntu($this->cli, $this->files);
+        } elseif (file_exists($arch_file) === true) {
+            return new Arch($this->cli, $this->files);
+        } else {  // default
+            return new Ubuntu($this->cli, $this->files);
         }
     }
 
